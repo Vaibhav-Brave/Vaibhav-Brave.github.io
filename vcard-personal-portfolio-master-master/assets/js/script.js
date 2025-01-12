@@ -2,16 +2,6 @@
 
 
 // emailjs.init("YXwRtoSDOwDdouLcH"); // Replace with your Public Key from EmailJS
-  let userName = document.getElementById('name').value;
-  let email = document.getElementById('email').value;
-  let message = document.getElementById('message').value;
-
-document.getElementById('send').addEventListener('click', ()=> {
-  
-  userName = "";
-  email="";
-  message= "";
-  });
 
 
 // element toggle function
