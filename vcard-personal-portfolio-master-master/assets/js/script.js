@@ -1,36 +1,17 @@
 'use strict';
 
-emailjs.init("YXwRtoSDOwDdouLcH"); // Replace with your Public Key from EmailJS
+
+// emailjs.init("YXwRtoSDOwDdouLcH"); // Replace with your Public Key from EmailJS
+  let userName = document.getElementById('name').value;
+  let email = document.getElementById('email').value;
+  let message = document.getElementById('message').value;
 
 document.getElementById('send').addEventListener('click', ()=> {
-
-  const name = document.getElementById('name').value;
-  const email = document.getElementById('email').value;
-  const message = document.getElementById('message').value;
-
-  // Get form values
-  if(email == "" && name == ""){
-    alert("Provide details");
-    
-  }else{
-
-  // Send email
-  emailjs.send("service_zua4zla", "template_xy43wr9", {
-    from_name: name,
-    from_email: email,
-    message: message
-  }).then(response => {
-    console.log("Email sent successfully!", response.status, response.text);
-    document.getElementById('statusMessage').style.display = 'block';
-    document.getElementById('contactForm').reset();
-  }).catch(error => {
-    console.error("Error sending email:", error);
-    alert("Failed to send the message. Please try again later.");
-  });
-  }
-
   
-});
+  userName = "";
+  email="";
+  message= "";
+  });
 
 
 // element toggle function
@@ -147,23 +128,23 @@ for (let i = 0; i < filterBtn.length; i++) {
 
 
 // contact form variables
-const form = document.querySelector("[data-form]");
-const formInputs = document.querySelectorAll("[data-form-input]");
-const formBtn = document.querySelector("[data-form-btn]");
+// const form = document.querySelector("[data-form]");
+// const formInputs = document.querySelectorAll("[data-form-input]");
+// const formBtn = document.querySelector("[data-form-btn]");
 
-// add event to all form input field
-for (let i = 0; i < formInputs.length; i++) {
-  formInputs[i].addEventListener("input", function () {
+// // add event to all form input field
+// for (let i = 0; i < formInputs.length; i++) {
+//   formInputs[i].addEventListener("input", function () {
 
-    // check form validation
-    if (form.checkValidity()) {
-      formBtn.removeAttribute("disabled");
-    } else {
-      formBtn.setAttribute("disabled", "");
-    }
+//     // check form validation
+//     if (form.checkValidity()) {
+//       formBtn.removeAttribute("disabled");
+//     } else {
+//       formBtn.setAttribute("disabled", "");
+//     }
 
-  });
-}
+//   });
+// }
 
 
 
