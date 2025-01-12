@@ -1,5 +1,36 @@
 'use strict';
 
+emailjs.init("YXwRtoSDOwDdouLcH"); // Replace with your Public Key from EmailJS
+
+document.getElementById('send').addEventListener('click', ()=> {
+
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const message = document.getElementById('message').value;
+
+  // Get form values
+  if(email == "" && name == ""){
+    alert("Provide details");
+    
+  }else{
+
+  // Send email
+  emailjs.send("service_zua4zla", "template_xy43wr9", {
+    from_name: name,
+    from_email: email,
+    message: message
+  }).then(response => {
+    console.log("Email sent successfully!", response.status, response.text);
+    document.getElementById('statusMessage').style.display = 'block';
+    document.getElementById('contactForm').reset();
+  }).catch(error => {
+    console.error("Error sending email:", error);
+    alert("Failed to send the message. Please try again later.");
+  });
+  }
+
+  
+});
 
 
 // element toggle function
