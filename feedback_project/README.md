@@ -1,6 +1,4 @@
 # AI-Driven Comment / Feedback Intelligence System
-### S.M Joshi College – Final Year Project
-
 ---
 
 ## What This Project Does
