@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Feedback #{{ feedback.id }} – FeedbackAI{% endblock %}
+
+{% block content %}
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h4><i class="bi bi-chat-text me-2" style="color:#028090"></i>Feedback #{{ feedback.id }}</h4>
+        <small class="text-muted">Detailed view</small>
+    </div>
+    <a href="{{ url_for('all_feedback') }}" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to All
+    </a>
+</div>
+
+<div class="row">
+    <!-- Left: Feedback Text + Metadata -->
+    <div class="col-md-7">
+        <div class="chart-card">
+            <h6 class="fw-bold mb-3" style="color:#1A2B5E">Feedback Text</h6>
+            <div class="p-3 rounded" style="background:#f8f9fa; font-size:1.05rem; line-height:1.7; color:#2D3748;">
+                "{{ feedback.text }}"
+            </div>
+
+            <div class="row mt-4 g-3">
+                <div class="col-6">
+                    <div class="small text-muted mb-1">Category</div>
+                    <span class="badge bg-light text-dark border px-3 py-2">{{ feedback.category | capitalize }}</span>
+                </div>
+                <div class="col-6">
+                    <div class="small text-muted mb-1">Source</div>
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary border px-3 py-2">{{ feedback.source }}</span>
+                </div>
+                <div class="col-6">
+                    <div class="small text-muted mb-1">Submitted On</div>
+                    <span class="small fw-semibold">
+                        {{ feedback.created_at.strftime('%d %B %Y, %I:%M %p') if feedback.created_at else 'N/A' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Sentiment Analysis Results -->
+    <div class="col-md-5">
+        <div class="chart-card text-center">
+            {% set colors = {'positive': '#28a745', 'negative': '#dc3545', 'neutral': '#ffc107'} %}
+            {% set icons  = {'positive': 'emoji-smile', 'negative': 'emoji-frown', 'neutral': 'emoji-neutral'} %}
+            {% set color  = colors.get(feedback.sentiment, '#6c757d') %}
+            {% set icon   = icons.get(feedback.sentiment, 'question') %}
+
+            <h6 class="fw-bold mb-3" style="color:#1A2B5E">Sentiment Analysis Result</h6>
+
+            <i class="bi bi-{{ icon }}" style="font-size:3.5rem; color:{{ color }}"></i>
+            <div style="font-size:1.8rem; font-weight:700; color:{{ color }}; margin: 8px 0;">
+                {{ feedback.sentiment | upper }}
+            </div>
+
+            <hr>
+
+            <!-- Polarity -->
+            <div class="mb-3 text-start">
+                <div class="d-flex justify-content-between small mb-1">
+                    <span class="text-muted">Polarity Score</span>
+                    <strong style="color:{{ color }}">{{ feedback.polarity }}</strong>
+                </div>
+                <div class="polarity-bar">
+                    {% set pct = (((feedback.polarity + 1) / 2) * 100) | int %}
+                    <div class="polarity-fill" style="width:{{ pct }}%; background:{{ color }};"></div>
+                </div>
+                <div class="d-flex justify-content-between small text-muted mt-1">
+                    <span>-1.0 (Very Negative)</span>
+                    <span>+1.0 (Very Positive)</span>
+                </div>
+            </div>
+
+            <!-- Subjectivity -->
+            <div class="text-start">
+                <div class="d-flex justify-content-between small mb-1">
+                    <span class="text-muted">Subjectivity Score</span>
+                    <strong>{{ feedback.subjectivity }}</strong>
+                </div>
+                <div class="polarity-bar">
+                    {% set sub_pct = (feedback.subjectivity * 100) | int %}
+                    <div class="polarity-fill" style="width:{{ sub_pct }}%; background:#6c757d;"></div>
+                </div>
+                <div class="d-flex justify-content-between small text-muted mt-1">
+                    <span>0.0 (Objective)</span>
+                    <span>1.0 (Subjective)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Button -->
+        <div class="chart-card mt-0">
+            <form method="POST" action="{{ url_for('delete_feedback', feedback_id=feedback.id) }}"
+                  onsubmit="return confirm('Are you sure you want to delete this feedback?')">
+                <button type="submit" class="btn btn-outline-danger w-100">
+                    <i class="bi bi-trash me-2"></i>Delete This Feedback
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

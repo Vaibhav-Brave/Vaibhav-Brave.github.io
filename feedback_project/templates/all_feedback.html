@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}All Feedback – FeedbackAI{% endblock %}
+
+{% block content %}
+
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h4><i class="bi bi-list-ul me-2" style="color:#028090"></i>All Feedback</h4>
+        <small class="text-muted">Browse, filter and manage all feedback records</small>
+    </div>
+    <a href="{{ url_for('submit_feedback') }}" class="btn btn-sm text-white" style="background:#028090;">
+        <i class="bi bi-plus me-1"></i>Add New
+    </a>
+</div>
+
+<!-- Filter Bar -->
+<div class="chart-card mb-3">
+    <form method="GET" class="row g-2 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold mb-1">Filter by Sentiment</label>
+            <select name="sentiment" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="all" {% if sentiment_filter == 'all' %}selected{% endif %}>All Sentiments</option>
+                <option value="positive" {% if sentiment_filter == 'positive' %}selected{% endif %}>Positive</option>
+                <option value="neutral"  {% if sentiment_filter == 'neutral'  %}selected{% endif %}>Neutral</option>
+                <option value="negative" {% if sentiment_filter == 'negative' %}selected{% endif %}>Negative</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-semibold mb-1">Filter by Category</label>
+            <select name="category" class="form-select form-select-sm" onchange="this.form.submit()">
+                <option value="all">All Categories</option>
+                {% for cat in categories %}
+                    <option value="{{ cat }}" {% if category_filter == cat %}selected{% endif %}>{{ cat | capitalize }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ url_for('all_feedback') }}" class="btn btn-sm btn-outline-secondary w-100">Clear Filters</a>
+        </div>
+        <div class="col-md-4 text-end">
+            <span class="text-muted small">{{ feedbacks | length }} record(s) found</span>
+        </div>
+    </form>
+</div>
+
+<!-- Feedback Table -->
+<div class="chart-card">
+    {% if feedbacks %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead style="background:#f4f7fb;">
+                <tr>
+                    <th>#</th>
+                    <th>Feedback Text</th>
+                    <th>Sentiment</th>
+                    <th>Polarity</th>
+                    <th>Subjectivity</th>
+                    <th>Category</th>
+                    <th>Source</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for fb in feedbacks %}
+            <tr>
+                <td class="text-muted small">{{ fb.id }}</td>
+                <td style="max-width:300px">
+                    <span title="{{ fb.text }}">
+                        {{ fb.text[:90] }}{% if fb.text|length > 90 %}...{% endif %}
+                    </span>
+                </td>
+                <td>
+                    <span class="badge badge-{{ fb.sentiment }} px-2 py-1">
+                        {{ fb.sentiment | capitalize }}
+                    </span>
+                </td>
+                <td>
+                    <span style="font-weight:600; color:{% if fb.polarity > 0.1 %}#28a745{% elif fb.polarity < -0.1 %}#dc3545{% else %}#ffc107{% endif %}">
+                        {{ fb.polarity }}
+                    </span>
+                </td>
+                <td class="text-muted small">{{ fb.subjectivity }}</td>
+                <td><span class="badge bg-light text-dark border">{{ fb.category }}</span></td>
+                <td><span class="badge bg-secondary bg-opacity-10 text-secondary border small">{{ fb.source }}</span></td>
+                <td class="text-muted small">{{ fb.created_at.strftime('%d %b %Y') if fb.created_at else '' }}</td>
+                <td>
+                    <a href="{{ url_for('view_feedback', feedback_id=fb.id) }}"
+                       class="btn btn-sm btn-outline-primary py-0 me-1">View</a>
+                    <form method="POST" action="{{ url_for('delete_feedback', feedback_id=fb.id) }}"
+                          style="display:inline"
+                          onsubmit="return confirm('Delete this feedback?')">
+                        <button type="submit" class="btn btn-sm btn-outline-danger py-0">Del</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-center text-muted py-5">
+        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+        No feedback found with these filters.
+        <a href="{{ url_for('all_feedback') }}">Clear filters</a> or
+        <a href="{{ url_for('submit_feedback') }}">add feedback</a>.
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

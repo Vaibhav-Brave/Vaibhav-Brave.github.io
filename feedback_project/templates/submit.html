@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Submit Feedback – FeedbackAI{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h4><i class="bi bi-plus-circle me-2" style="color:#028090"></i>Submit Feedback</h4>
+    <small class="text-muted">Enter a feedback to analyze its sentiment instantly</small>
+</div>
+
+<div class="row">
+    <!-- Feedback Form -->
+    <div class="col-md-7">
+        <div class="chart-card">
+            <form method="POST" id="feedbackForm">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Feedback Text <span class="text-danger">*</span></label>
+                    <textarea name="feedback_text" id="feedbackText" class="form-control" rows="5"
+                              placeholder="Type your feedback here..."
+                              oninput="livePreview(this.value)" required></textarea>
+                    <small class="text-muted">Minimum 5 characters.</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Category</label>
+                    <select name="category" class="form-select">
+                        <option value="general">General</option>
+                        <option value="product">Product</option>
+                        <option value="delivery">Delivery</option>
+                        <option value="support">Customer Support</option>
+                        <option value="usability">Usability</option>
+                        <option value="pricing">Pricing</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn text-white w-100" style="background:#1A2B5E;">
+                    <i class="bi bi-send me-2"></i>Analyze & Save Feedback
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Live Sentiment Preview -->
+    <div class="col-md-5">
+        <div class="chart-card">
+            <h6 class="fw-bold mb-3" style="color:#1A2B5E">
+                <i class="bi bi-lightning me-1" style="color:#028090"></i>Live Preview
+            </h6>
+            <div id="previewBox" class="text-center text-muted py-4">
+                <i class="bi bi-chat-dots fs-2 d-block mb-2 opacity-25"></i>
+                Start typing to see live sentiment analysis...
+            </div>
+        </div>
+
+        <!-- Tips Card -->
+        <div class="chart-card mt-0">
+            <h6 class="fw-bold mb-2" style="color:#1A2B5E">
+                <i class="bi bi-lightbulb me-1" style="color:#ffc107"></i>How Sentiment Works
+            </h6>
+            <ul class="small text-muted mb-0 ps-3">
+                <li class="mb-1"><span class="badge badge-positive">Positive</span> — Polarity &gt; 0.1</li>
+                <li class="mb-1"><span class="badge badge-neutral">Neutral</span> — Polarity between -0.1 and 0.1</li>
+                <li class="mb-1"><span class="badge badge-negative">Negative</span> — Polarity &lt; -0.1</li>
+                <li class="mt-2">Polarity ranges from <strong>-1.0</strong> (very negative) to <strong>+1.0</strong> (very positive).</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Calls the /api/analyze endpoint as the user types
+function livePreview(text) {
+    const box = document.getElementById('previewBox');
+    if (text.length < 3) {
+        box.innerHTML = '<i class="bi bi-chat-dots fs-2 d-block mb-2 opacity-25"></i>Start typing...';
+        return;
+    }
+
+    fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text })
+    })
+    .then(res => res.json())
+    .then(data => {
+        const colors = { positive: '#28a745', negative: '#dc3545', neutral: '#ffc107' };
+        const icons  = { positive: 'emoji-smile', negative: 'emoji-frown', neutral: 'emoji-neutral' };
+        const color  = colors[data.sentiment] || '#6c757d';
+        const icon   = icons[data.sentiment]  || 'question';
+
+        // Polarity bar fill (map -1..+1 to 0..100%)
+        const pct = Math.round(((data.polarity + 1) / 2) * 100);
+
+        box.innerHTML = `
+            <div class="text-center mb-3">
+                <i class="bi bi-${icon} fs-1" style="color:${color}"></i>
+                <div style="font-size:1.4rem; font-weight:700; color:${color}; margin-top:6px">
+                    ${data.sentiment.toUpperCase()}
+                </div>
+            </div>
+            <div class="mb-2">
+                <div class="d-flex justify-content-between small text-muted mb-1">
+                    <span>Polarity</span><strong style="color:${color}">${data.polarity}</strong>
+                </div>
+                <div class="polarity-bar">
+                    <div class="polarity-fill" style="width:${pct}%; background:${color};"></div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between small text-muted mt-2">
+                <span>Subjectivity</span><strong>${data.subjectivity}</strong>
+            </div>
+        `;
+    })
+    .catch(() => {
+        box.innerHTML = '<small class="text-danger">Could not analyze. Check server connection.</small>';
+    });
+}
+</script>
+{% endblock %}

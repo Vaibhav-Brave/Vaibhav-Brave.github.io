@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Upload CSV – FeedbackAI{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h4><i class="bi bi-upload me-2" style="color:#028090"></i>Upload CSV File</h4>
+    <small class="text-muted">Upload a file with multiple feedbacks for batch analysis</small>
+</div>
+
+<div class="row">
+    <div class="col-md-7">
+        <div class="chart-card">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Select CSV File <span class="text-danger">*</span></label>
+                    <input type="file" name="csv_file" class="form-control" accept=".csv" required>
+                    <small class="text-muted">Only .csv files are supported.</small>
+                </div>
+                <button type="submit" class="btn text-white w-100" style="background:#028090;">
+                    <i class="bi bi-cloud-upload me-2"></i>Upload & Analyze
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <!-- CSV Format Guide -->
+        <div class="chart-card">
+            <h6 class="fw-bold mb-3" style="color:#1A2B5E">
+                <i class="bi bi-info-circle me-1" style="color:#028090"></i>CSV Format Guide
+            </h6>
+            <p class="small text-muted mb-2">Your CSV must have at least one of these column names:</p>
+            <ul class="small text-muted mb-3 ps-3">
+                <li><code>text</code></li>
+                <li><code>feedback</code></li>
+                <li><code>comment</code></li>
+                <li><code>review</code></li>
+            </ul>
+            <p class="small text-muted mb-2">Optional column: <code>category</code></p>
+            <div class="bg-light rounded p-2 small">
+                <strong>Example CSV:</strong><br>
+                <code>text,category</code><br>
+                <code>"Great product!",product</code><br>
+                <code>"Slow delivery",delivery</code>
+            </div>
+        </div>
+
+        <!-- Sample Download -->
+        <div class="chart-card mt-0">
+            <h6 class="fw-bold mb-2" style="color:#1A2B5E">
+                <i class="bi bi-download me-1" style="color:#028090"></i>Need a Sample File?
+            </h6>
+            <p class="small text-muted mb-2">Create a file called <code>sample_feedback.csv</code> and paste this content:</p>
+            <div class="bg-light rounded p-2 small" style="font-family:monospace; font-size:11px; overflow-x:auto;">
+text,category<br>
+"The product is excellent",product<br>
+"Very poor service",support<br>
+"Average experience",general<br>
+"Fast delivery, very happy!",delivery<br>
+"Would not buy again",product
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

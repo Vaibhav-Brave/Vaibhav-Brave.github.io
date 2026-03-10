@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – FeedbackAI{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header d-flex justify-content-between align-items-center">
+    <div>
+        <h4><i class="bi bi-speedometer2 me-2" style="color:#028090"></i>Dashboard</h4>
+        <small class="text-muted">Overview of all feedback and sentiment analysis</small>
+    </div>
+    <a href="{{ url_for('submit_feedback') }}" class="btn btn-sm" style="background:#028090;color:white;">
+        <i class="bi bi-plus-circle me-1"></i>Add Feedback
+    </a>
+</div>
+
+<!-- ── Stat Cards ── -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg,#1A2B5E,#2a4080)">
+            <div class="number">{{ total }}</div>
+            <div class="label"><i class="bi bi-chat-text me-1"></i>Total Feedback</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg,#28a745,#20903a)">
+            <div class="number">{{ sentiment_counts.get('positive', 0) }}</div>
+            <div class="label"><i class="bi bi-emoji-smile me-1"></i>Positive</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg,#dc3545,#b02a37)">
+            <div class="number">{{ sentiment_counts.get('negative', 0) }}</div>
+            <div class="label"><i class="bi bi-emoji-frown me-1"></i>Negative</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="background: linear-gradient(135deg,#028090,#016070)">
+            <div class="number">{{ avg_polarity }}</div>
+            <div class="label"><i class="bi bi-activity me-1"></i>Avg. Polarity</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Charts Row ── -->
+<div class="row g-3 mb-4">
+    <div class="col-md-5">
+        <div class="chart-card text-center">
+            <h6 class="fw-bold mb-3" style="color:#1A2B5E">Sentiment Distribution</h6>
+            {% if pie_chart %}
+                <img src="data:image/png;base64,{{ pie_chart }}" class="img-fluid" alt="Sentiment Pie Chart">
+            {% else %}
+                <p class="text-muted">No data yet. Add some feedback!</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="chart-card">
+            <h6 class="fw-bold mb-3" style="color:#1A2B5E">Polarity Scores (Last 20)</h6>
+            {% if polarity_chart %}
+                <img src="data:image/png;base64,{{ polarity_chart }}" class="img-fluid" alt="Polarity Chart">
+            {% else %}
+                <p class="text-muted">No data yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ── Recent Feedback Table ── -->
+<div class="chart-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold mb-0" style="color:#1A2B5E">Recent Feedback</h6>
+        <a href="{{ url_for('all_feedback') }}" class="btn btn-sm btn-outline-secondary">View All</a>
+    </div>
+    {% if recent_feedback %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead style="background:#f4f7fb;">
+                <tr>
+                    <th>#</th>
+                    <th>Feedback Text</th>
+                    <th>Sentiment</th>
+                    <th>Polarity</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for fb in recent_feedback %}
+            <tr>
+                <td class="text-muted small">{{ fb.id }}</td>
+                <td style="max-width:280px">
+                    <span title="{{ fb.text }}">
+                        {{ fb.text[:80] }}{% if fb.text|length > 80 %}...{% endif %}
+                    </span>
+                </td>
+                <td>
+                    <span class="badge badge-{{ fb.sentiment }} px-2 py-1">
+                        {{ fb.sentiment | capitalize }}
+                    </span>
+                </td>
+                <td>
+                    <span style="color:{% if fb.polarity > 0.1 %}#28a745{% elif fb.polarity < -0.1 %}#dc3545{% else %}#ffc107{% endif %}; font-weight:600">
+                        {{ fb.polarity }}
+                    </span>
+                </td>
+                <td><span class="badge bg-light text-dark">{{ fb.category }}</span></td>
+                <td class="text-muted small">{{ fb.created_at.strftime('%d %b %Y') if fb.created_at else '' }}</td>
+                <td>
+                    <a href="{{ url_for('view_feedback', feedback_id=fb.id) }}" class="btn btn-sm btn-outline-primary py-0">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="text-center text-muted py-4">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            No feedback yet. <a href="{{ url_for('submit_feedback') }}">Add some!</a>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Analytics – FeedbackAI{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <h4><i class="bi bi-bar-chart-line me-2" style="color:#028090"></i>Analytics</h4>
+    <small class="text-muted">Detailed charts and insights from all feedback data</small>
+</div>
+
+<!-- Sentiment Summary Badges -->
+<div class="row g-3 mb-4">
+    {% for row in sentiment_data %}
+    {% set colors = {'positive': '#28a745', 'negative': '#dc3545', 'neutral': '#ffc107'} %}
+    <div class="col-md-4">
+        <div class="chart-card text-center py-3">
+            <div style="font-size:2rem; font-weight:700; color:{{ colors.get(row.sentiment, '#6c757d') }}">
+                {{ row.count }}
+            </div>
+            <span class="badge badge-{{ row.sentiment }} px-3 py-2 mt-1">
+                {{ row.sentiment | capitalize }}
+            </span>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="alert alert-info">No data yet. Add some feedback to see analytics!</div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Charts -->
+<div class="row g-3">
+
+    <!-- Word Cloud -->
+    {% if charts.wordcloud %}
+    <div class="col-12">
+        <div class="chart-card text-center">
+            <h6 class="fw-bold mb-3" style="color:#1A2B5E">Word Cloud – Most Common Words</h6>
+            <img src="data:image/png;base64,{{ charts.wordcloud }}" class="img-fluid rounded" alt="Word Cloud">
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Category Chart -->
+    {% if charts.category %}
+    <div class="col-md-6">
+        <div class="chart-card text-center">
+            <h6 class="fw-bold mb-3" style="color:#1A2B5E">Feedback by Category</h6>
+            <img src="data:image/png;base64,{{ charts.category }}" class="img-fluid" alt="Category Chart">
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Polarity Histogram -->
+    {% if charts.histogram %}
+    <div class="col-md-6">
+        <div class="chart-card text-center">
+            <h6 class="fw-bold mb-3" style="color:#1A2B5E">Polarity Distribution</h6>
+            <img src="data:image/png;base64,{{ charts.histogram }}" class="img-fluid" alt="Polarity Histogram">
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}
